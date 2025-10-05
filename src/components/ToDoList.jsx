@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import './style.css';
+import { useState } from "react";
 
 export default function ToDoList() {
   const [data, setData] = useState([]);
-  const [item, setItem] = useState('');
+  const [item, setItem] = useState("");
   const [loading, setLoading] = useState(false);
-  const [deleted, setDeleted] = useState({});
+  const [deleted, setDeleted] = useState(null);
 
   const submit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     try {
+      if (!item.trim()) return;
       setData((d) => [
         ...d,
         {
           value: item,
-          id: new Date(),
+          id: Date.now(),
         },
       ]);
-      setItem('');
-      e.preventDefault();
+      setItem("");
     } catch (e) {
       console.error(e);
     } finally {
@@ -27,21 +27,24 @@ export default function ToDoList() {
   };
 
   const deleteItem = (id) => {
-    const deletedItem = data.filter((d) => d.id === id);
+    const deletedItem = data.find((d) => d.id === id);
     setDeleted(deletedItem);
     const newData = data.filter((d) => d.id !== id);
     setData(newData);
   };
 
   const reset = () => {
-    setData((d) => [...d, { value: deleted.value, id: new Date() }]);
+    if (deleted) {
+      setData((d) => [...d, deleted]);
+      setDeleted(null);
+    }
   };
 
   const newStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 10,
   };
 
@@ -58,7 +61,7 @@ export default function ToDoList() {
           />
         </div>
 
-        <button type="submit">{loading ? 'Adding....' : 'Add Item'}</button>
+        <button type="submit">{loading ? "Adding...." : "Add Item"}</button>
       </form>
       {data && (
         <ul>
@@ -69,7 +72,7 @@ export default function ToDoList() {
           ))}
         </ul>
       )}
-      {deleted.length > 0 && <button onClick={reset}>Reset Item</button>}
+      {deleted && <button onClick={reset}>Reset Item</button>}
     </div>
   );
 }
